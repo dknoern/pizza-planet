@@ -1,0 +1,164 @@
+// Pizza Planet data model.
+//
+// MongoDB-specific notes:
+//   - Embedded objects are declared with `type` (Prisma composite types).
+//   - Cross-collection transactions are NOT supported, so anything that must
+//     write atomically (Order + lines + payment + events) is embedded into
+//     a single document.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Identity
+// -----------------------------------------------------------------------------
+
+model Customer {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+
+  orders  Order[]
+  apiKeys ApiKey[]
+  cart    Cart?
+}
+
+model ApiKey {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  customerId String    @db.ObjectId
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  tokenHash  String    @unique
+  label      String
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+}
+
+// -----------------------------------------------------------------------------
+// Menu catalog
+// -----------------------------------------------------------------------------
+
+model MenuItem {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  slug           String    @unique
+  name           String
+  description    String
+  category       String // "PIZZA" | "SIDE" | "DRINK"
+  basePriceCents Int
+  available      Boolean   @default(true)
+  imageUrl       String?
+  // Cosmic visual metadata — used by the procedural PizzaVisual renderer.
+  // sauce: "red" | "pesto" | "bbq" | "white"
+  sauce          String?
+  // tag: "classic" | "hot" | "veg" — drives the colored badge on the card
+  tag            String?
+  sizes          Size[]
+  toppings       Topping[]
+  // Raw list of topping sprites (WITH repetition) for the procedural
+  // PizzaVisual renderer. Distinct from `toppings`, which is the dedupe
+  // list of human-readable ingredient names.
+  visualToppingIds String[] @default([])
+  createdAt      DateTime  @default(now())
+}
+
+type Size {
+  id              String
+  name            String
+  priceDeltaCents Int
+}
+
+type Topping {
+  id              String
+  name            String
+  priceDeltaCents Int
+}
+
+// -----------------------------------------------------------------------------
+// Cart (per logged-in customer; guests use localStorage only)
+// -----------------------------------------------------------------------------
+
+model Cart {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  customerId String     @unique @db.ObjectId
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  lines      CartLine[]
+  updatedAt  DateTime   @updatedAt
+}
+
+type CartLine {
+  menuItemId String
+  sizeId     String
+  toppingIds String[]
+  quantity   Int
+}
+
+// -----------------------------------------------------------------------------
+// Orders (append-only; status transitions appended to `events`)
+// -----------------------------------------------------------------------------
+
+model Order {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber      String          @unique
+  customerId       String?         @db.ObjectId
+  customer         Customer?       @relation(fields: [customerId], references: [id])
+  guestContact     GuestContact?
+  deliveryAddress  DeliveryAddress
+  lines            OrderLine[]
+  subtotalCents    Int
+  taxCents         Int
+  deliveryFeeCents Int
+  totalCents       Int
+  payment          Payment
+  status           String // "PLACED" | "IN_KITCHEN" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELED"
+  events           OrderEvent[]
+  createdAt        DateTime        @default(now())
+
+  @@index([customerId, createdAt(sort: Desc)])
+}
+
+type GuestContact {
+  name  String
+  email String
+  phone String
+}
+
+type DeliveryAddress {
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  postalCode String
+}
+
+type OrderLine {
+  menuItemId     String
+  menuItemName   String
+  sizeId         String
+  sizeName       String
+  toppingIds     String[]
+  toppingNames   String[]
+  unitPriceCents Int
+  quantity       Int
+  lineTotalCents Int
+}
+
+// IMPORTANT: never store PAN or CVV. Only the data fields below are persisted.
+type Payment {
+  last4           String
+  brand           String
+  authorizationId String
+  amountCents     Int
+}
+
+type OrderEvent {
+  at      DateTime
+  kind    String // "PLACED" | "STATUS_CHANGED" | ...
+  message String?
+}
