@@ -9,6 +9,10 @@ frontend:
     build:
       commands:
         - echo "DATABASE_URL=$DATABASE_URL" >> .env
+        - echo "SESSION_SECRET="change-me-to-32-plus-random-chars-or-the-app-will-refuse-to-boot"
+        - echo "PAYMENT_SIM_MODE="simulator" >> .env
+        - echo "GUEST_TOKEN_SECRET="change-me-too-32-plus-random-chars" >> .env
+        - echo "NODE_ENV=production" >> .env
         - pnpm build
   artifacts:
     baseDirectory: .next
