@@ -8,6 +8,7 @@ frontend:
         - pnpm prisma generate
     build:
       commands:
+        - echo "DATABASE_URL=$DATABASE_URL" >> .env
         - pnpm build
   artifacts:
     baseDirectory: .next
