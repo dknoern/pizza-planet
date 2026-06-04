@@ -1,7 +1,7 @@
 ## 1. Setup & schema
 
 - [x] 1.1 Add `amazonUserId String? @unique` to `Customer` in `prisma/schema.prisma`
-- [ ] 1.2 Run `pnpm prisma generate` and `pnpm db:push` against the dev database to verify the index applies cleanly
+- [x] 1.2 Run `pnpm prisma generate` and `pnpm db:push` against the dev database to verify the index applies cleanly
 - [x] 1.3 Document `LWA_CLIENT_ID`, `LWA_CLIENT_SECRET`, `LWA_REDIRECT_URI` (and `LWA_COOKIE_SECRET`) in `.env.example` with one-line descriptions; do NOT commit real values
 - [x] 1.4 Add a typed env loader in `lib/auth/amazonEnv.ts` that reads the four LWA env vars and throws a clear error if any are missing when LWA is invoked
 
@@ -55,9 +55,9 @@
 
 ## 8. Deploy
 
-- [ ] 8.1 Register the LWA Security Profile in the Amazon Developer console; record `client_id` and `client_secret`
-- [ ] 8.2 Add `https://<prod-amplify-domain>/api/auth/amazon/callback` to Allowed Return URLs
-- [ ] 8.3 Add a ngrok URL (or similar HTTPS tunnel) for local dev as a second Allowed Return URL
-- [ ] 8.4 Set `LWA_CLIENT_ID`, `LWA_CLIENT_SECRET`, `LWA_REDIRECT_URI`, `LWA_COOKIE_SECRET` in the Amplify console (App settings → Environment variables)
-- [ ] 8.5 Deploy, verify the button appears and a real Amazon sign-in completes end-to-end on production
-- [ ] 8.6 Manually verify auto-link: sign up with email/password first, then sign in with the same email via Amazon — confirm the existing customer is reused (same `_id`)
+- [x] 8.1 Register the LWA Security Profile in the Amazon Developer console; record `client_id` and `client_secret`
+- [x] 8.2 Add `https://<prod-amplify-domain>/api/auth/amazon/callback` to Allowed Return URLs
+- [x] 8.3 Add a ngrok URL (or similar HTTPS tunnel) for local dev as a second Allowed Return URL
+- [x] 8.4 Set `LWA_CLIENT_ID`, `LWA_CLIENT_SECRET`, `LWA_REDIRECT_URI`, `LWA_COOKIE_SECRET` in the Amplify console (App settings → Environment variables)
+- [x] 8.5 Deploy, verify the button appears and a real Amazon sign-in completes end-to-end on production
+- [x] 8.6 Manually verify auto-link: sign up with email/password first, then sign in with the same email via Amazon — confirm the existing customer is reused (same `_id`)
