@@ -1,4 +1,5 @@
 import { resolveCustomer } from "@/lib/auth/requireCustomer";
+import { SignInWithAmazonButton } from "../components/SignInWithAmazonButton";
 import { CheckoutForm } from "./CheckoutForm";
 
 export default async function CheckoutPage() {
@@ -20,6 +21,11 @@ export default async function CheckoutPage() {
           )}
         </div>
       </div>
+      {auth ? null : (
+        <div style={{ maxWidth: 460, margin: "16px 0" }}>
+          <SignInWithAmazonButton next="/checkout" />
+        </div>
+      )}
       <CheckoutForm signedIn={!!auth} />
     </div>
   );

@@ -13,6 +13,11 @@ export type ErrorCode =
   | "ITEM_UNAVAILABLE"
   | "PAYMENT_DECLINED"
   | "METHOD_NOT_ALLOWED"
+  | "LWA_NOT_CONFIGURED"
+  | "INVALID_STATE"
+  | "LWA_EXCHANGE_FAILED"
+  | "LWA_PROFILE_UNAVAILABLE"
+  | "AMAZON_ACCOUNT_ALREADY_LINKED"
   | "INTERNAL";
 
 export class ApiError extends Error {

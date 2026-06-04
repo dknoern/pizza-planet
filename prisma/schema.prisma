@@ -20,15 +20,22 @@ datasource db {
 // -----------------------------------------------------------------------------
 
 model Customer {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  email        String   @unique
-  passwordHash String
-  name         String
-  createdAt    DateTime @default(now())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  email         String   @unique
+  passwordHash  String
+  name          String
+  // Stable Amazon user_id (e.g. amzn1.account.…) for customers who linked
+  // via Login with Amazon. Indexed (not unique) because MongoDB's default
+  // unique index treats multiple nulls as a collision; uniqueness is enforced
+  // at the application layer in lib/auth/amazonLink.ts.
+  amazonUserId  String?
+  createdAt     DateTime @default(now())
 
   orders  Order[]
   apiKeys ApiKey[]
   cart    Cart?
+
+  @@index([amazonUserId])
 }
 
 model ApiKey {

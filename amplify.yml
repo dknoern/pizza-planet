@@ -12,6 +12,10 @@ frontend:
         - echo "PAYMENT_SIM_MODE=$PAYMENT_SIM_MODE" >> .env
         - echo "GUEST_TOKEN_SECRET=$GUEST_TOKEN_SECRET" >> .env
         - echo "NODE_ENV=$NODE_ENV" >> .env
+        - echo "LWA_CLIENT_ID=$LWA_CLIENT_ID" >> .env
+        - echo "LWA_CLIENT_SECRET=$LWA_CLIENT_SECRET" >> .env
+        - echo "LWA_REDIRECT_URI=$LWA_REDIRECT_URI" >> .env
+        - echo "LWA_COOKIE_SECRET=$LWA_COOKIE_SECRET" >> .env
         - pnpm build
   artifacts:
     baseDirectory: .next
