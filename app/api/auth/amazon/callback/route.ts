@@ -67,7 +67,12 @@ export async function GET(req: NextRequest): Promise<Response> {
     await clearLwaCookie();
 
     const next = isSafeNextPath(scratch.next) ? scratch.next! : "/";
-    return NextResponse.redirect(new URL(next, req.nextUrl.origin), { status: 302 });
+    // Behind Amplify Hosting (and most proxy fronts) req.nextUrl.origin is the
+    // internal Lambda URL (often http://localhost:3000) rather than the public
+    // origin. LWA_REDIRECT_URI is the canonical public URL we just used for the
+    // OAuth round-trip, so its origin is the correct destination.
+    const origin = new URL(env.redirectUri).origin;
+    return NextResponse.redirect(new URL(next, origin), { status: 302 });
   } catch (err) {
     await clearLwaCookie();
     if (err instanceof ApiError) return toResponse(err);
