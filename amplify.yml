@@ -3,7 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm install -g pnpm
+        - npm install -g pnpm@9
         - pnpm install --frozen-lockfile
         - pnpm prisma generate
     build:
