@@ -4,15 +4,14 @@ frontend:
     preBuild:
       commands:
         - npm install -g pnpm@9
-        - pnpm install --frozen-lockfile
-        - pnpm prisma generate
+        - pnpm install --frozen-lockfile --prod=false
     build:
       commands:
         - echo "DATABASE_URL=$DATABASE_URL" >> .env
-        - echo "SESSION_SECRET="change-me-to-32-plus-random-chars-or-the-app-will-refuse-to-boot"
-        - echo "PAYMENT_SIM_MODE="simulator" >> .env
-        - echo "GUEST_TOKEN_SECRET="change-me-too-32-plus-random-chars" >> .env
-        - echo "NODE_ENV=production" >> .env
+        - echo "SESSION_SECRET=$SESSION_SECRET" >> .env
+        - echo "PAYMENT_SIM_MODE=$PAYMENT_SIM_MODE" >> .env
+        - echo "GUEST_TOKEN_SECRET=$GUEST_TOKEN_SECRET" >> .env
+        - echo "NODE_ENV=$NODE_ENV" >> .env
         - pnpm build
   artifacts:
     baseDirectory: .next
